@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async'; // Added for Timer
+import 'package:flutter/widgets.dart'; // Added for Navigator
+import 'map_screen.dart'; // Import the new map screen
 
 void main() {
   runApp(const MyApp());
@@ -83,56 +85,65 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildGridItem(String name, String? imagePath, {bool isAddMore = false}) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      elevation: 4,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Expanded(
-            flex: 2,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                image: imagePath != null
-                    ? DecorationImage(
-                        image: AssetImage(imagePath),
-                        fit: BoxFit.cover,
+    return GestureDetector(
+      onTap: () {
+        if (!isAddMore) {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => MapScreen(riverName: name)),
+          );
+        }
+      },
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 4,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Expanded(
+              flex: 2,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                  image: imagePath != null
+                      ? DecorationImage(
+                          image: AssetImage(imagePath),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+                  color: isAddMore ? Colors.grey[300] : null,
+                ),
+                child: isAddMore
+                    ? const Icon(
+                        Icons.add,
+                        size: 70,
+                        color: Colors.black,
                       )
                     : null,
-                color: isAddMore ? Colors.grey[300] : null,
               ),
-              child: isAddMore
-                  ? const Icon(
-                      Icons.add,
-                      size: 70,
-                      color: Colors.black,
-                    )
-                  : null,
             ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                name,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+            Expanded(
+              flex: 1,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
                 ),
-                textAlign: TextAlign.center,
+                alignment: Alignment.center,
+                child: Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
