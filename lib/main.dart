@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Aquasense',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -33,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Timer(const Duration(seconds: 2), () {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const MyHomePage(title: 'Flutter Demo Home Page')),
+        MaterialPageRoute(builder: (context) => const MyHomePage(title: 'Aquasense Home Page')),
       );
     });
   }
@@ -83,33 +83,57 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildGridItem(String name, String? imagePath, {bool isAddMore = false}) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Container(
-          width: 100,
-          height: 100,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            image: imagePath != null
-                ? DecorationImage(
-                    image: AssetImage(imagePath),
-                    fit: BoxFit.cover,
-                  )
-                : null,
-            color: isAddMore ? Colors.grey[300] : null,
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      elevation: 4,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Expanded(
+            flex: 2,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                image: imagePath != null
+                    ? DecorationImage(
+                        image: AssetImage(imagePath),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+                color: isAddMore ? Colors.grey[300] : null,
+              ),
+              child: isAddMore
+                  ? const Icon(
+                      Icons.add,
+                      size: 70,
+                      color: Colors.black,
+                    )
+                  : null,
+            ),
           ),
-          child: isAddMore
-              ? Icon(
-                  Icons.add,
-                  size: 50,
+          Expanded(
+            flex: 1,
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                name,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                   color: Colors.black,
-                )
-              : null,
-        ),
-        SizedBox(height: 8),
-        Text(name),
-      ],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
