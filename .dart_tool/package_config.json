@@ -2,6 +2,12 @@
   "configVersion": 2,
   "packages": [
     {
+      "name": "animated_stack_widget",
+      "rootUri": "file:///Users/hm-mac/.pub-cache/hosted/pub.dev/animated_stack_widget-0.0.4",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "async",
       "rootUri": "file:///Users/hm-mac/.pub-cache/hosted/pub.dev/async-2.10.0",
       "packageUri": "lib/",
@@ -32,10 +38,22 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "crypto",
+      "rootUri": "file:///Users/hm-mac/.pub-cache/hosted/pub.dev/crypto-3.0.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
       "name": "cupertino_icons",
       "rootUri": "file:///Users/hm-mac/.pub-cache/hosted/pub.dev/cupertino_icons-1.0.6",
       "packageUri": "lib/",
       "languageVersion": "2.19"
+    },
+    {
+      "name": "event_bus",
+      "rootUri": "file:///Users/hm-mac/.pub-cache/hosted/pub.dev/event_bus-2.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
     },
     {
       "name": "fake_async",
@@ -60,6 +78,12 @@
       "rootUri": "file:///Users/hm-mac/.pub-cache/hosted/pub.dev/flutter_map-4.0.0",
       "packageUri": "lib/",
       "languageVersion": "2.18"
+    },
+    {
+      "name": "flutter_map_marker_popup",
+      "rootUri": "file:///Users/hm-mac/.pub-cache/hosted/pub.dev/flutter_map_marker_popup-4.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
     },
     {
       "name": "flutter_test",
@@ -134,6 +158,18 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "mqtt_client",
+      "rootUri": "file:///Users/hm-mac/.pub-cache/hosted/pub.dev/mqtt_client-9.8.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "nested",
+      "rootUri": "file:///Users/hm-mac/.pub-cache/hosted/pub.dev/nested-1.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "path",
       "rootUri": "file:///Users/hm-mac/.pub-cache/hosted/pub.dev/path-1.8.2",
       "packageUri": "lib/",
@@ -148,6 +184,12 @@
     {
       "name": "proj4dart",
       "rootUri": "file:///Users/hm-mac/.pub-cache/hosted/pub.dev/proj4dart-2.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "provider",
+      "rootUri": "file:///Users/hm-mac/.pub-cache/hosted/pub.dev/provider-6.1.4",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -230,7 +272,7 @@
       "languageVersion": "2.19"
     }
   ],
-  "generated": "2025-04-23T13:04:06.077874Z",
+  "generated": "2025-04-23T13:18:22.620668Z",
   "generator": "pub",
   "generatorVersion": "2.19.6"
 }
