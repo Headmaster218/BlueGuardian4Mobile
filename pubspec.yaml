@@ -34,7 +34,7 @@ dependencies:
   flutter_map: ^4.0.0 # Added for map functionality
   latlong2: ^0.8.1    # Added for LatLng support
   flutter_map_marker_popup: ^4.0.0 # Added for marker popups
-  mqtt_client: ^9.6.1 # Added for MQTT functionality
+  mqtt_client: ^9.0.0 # Added for MQTT functionality
 
 dev_dependencies:
   flutter_test:
