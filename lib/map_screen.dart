@@ -18,6 +18,7 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   late MqttServerClient client;
   final PopupController popupController = PopupController();
+  final Map<String, Map<String, dynamic>> sensorData = {}; // Store real-time data for each marker
 
   @override
   void initState() {
@@ -32,11 +33,40 @@ class _MapScreenState extends State<MapScreen> {
     client.onDisconnected = _onDisconnected;
     client.onSubscribed = _onSubscribed;
 
+    client.updates?.listen((List<MqttReceivedMessage<MqttMessage>> messages) {
+      final MqttPublishMessage message = messages[0].payload as MqttPublishMessage;
+      final payload = MqttPublishPayload.bytesToStringAsString(message.payload.message);
+      _onMessage(payload); // Handle incoming message
+    });
+
     try {
       await client.connect();
     } catch (e) {
       print('MQTT connection failed: $e');
       client.disconnect();
+    }
+  }
+
+  void _onMessage(String payload) {
+    try {
+      final parts = payload.split(',');
+      final id = parts[0]; // Sensor ID
+      final data = {
+        'timestamp': parts[1],
+        'do': parts[2],
+        'tds': parts[3],
+        'turb': parts[4],
+        'ph': parts[5],
+        'temp': parts[6],
+      };
+
+      setState(() {
+        sensorData[id] = data; // Update sensor data
+      });
+
+      print('Updated data for sensor $id: $data');
+    } catch (e) {
+      print('Failed to parse message: $e');
     }
   }
 
@@ -95,7 +125,12 @@ class _MapScreenState extends State<MapScreen> {
                 Marker(
                   point: LatLng(51.5495, -0.0280), // Sensor 1 location
                   builder: (context) => GestureDetector(
-                    onTap: () => popupController.togglePopup(LatLng(51.5495, -0.0280)),
+                    onTap: () => popupController.togglePopup(
+                      Marker(
+                        point: LatLng(51.5495, -0.0280),
+                        builder: (_) => const SizedBox(),
+                      ),
+                    ),
                     child: Container(
                       width: 30,
                       height: 30,
@@ -127,9 +162,14 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
                 Marker(
-                  point: LatLng(51.5500, -0.0300), // Sensor 2 location
+                  point: LatLng(51.55500, -0.0344), // Sensor 2 location
                   builder: (context) => GestureDetector(
-                    onTap: () => popupController.togglePopup(LatLng(51.5500, -0.0300)),
+                    onTap: () => popupController.togglePopup(
+                      Marker(
+                        point: LatLng(51.55500, -0.0344),
+                        builder: (_) => const SizedBox(),
+                      ),
+                    ),
                     child: Container(
                       width: 30,
                       height: 30,
@@ -161,9 +201,14 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
                 Marker(
-                  point: LatLng(51.5480, -0.0270), // Sensor 3 location
+                  point: LatLng(51.54190, -0.02150), // Sensor 3 location
                   builder: (context) => GestureDetector(
-                    onTap: () => popupController.togglePopup(LatLng(51.5480, -0.0270)),
+                    onTap: () => popupController.togglePopup(
+                      Marker(
+                        point: LatLng(51.54190, -0.02150),
+                        builder: (_) => const SizedBox(),
+                      ),
+                    ),
                     child: Container(
                       width: 30,
                       height: 30,
@@ -196,28 +241,38 @@ class _MapScreenState extends State<MapScreen> {
                 ),
               ],
               popupBuilder: (context, marker) {
-                String sensorData;
-                if (marker.point == LatLng(51.5495, -0.0280)) {
-                  sensorData = 'Temperature: 22°C\nHumidity: 60%\nWater Level: 1.2m';
-                } else {
-                  sensorData = 'Temperature: N/A\nHumidity: N/A\nWater Level: N/A';
-                }
-                return Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text(
-                          'Sensor Data',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(sensorData),
-                      ],
+                final id = marker.point.toString();
+                final data = sensorData[id];
+                if (data != null) {
+                  return Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            'Sensor Data',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8),
+                          Text('Timestamp: ${data['timestamp']}'),
+                          Text('DO: ${data['do']}'),
+                          Text('TDS: ${data['tds']}'),
+                          Text('Turb: ${data['turb']}'),
+                          Text('pH: ${data['ph']}'),
+                          Text('Temp: ${data['temp']}'),
+                        ],
+                      ),
                     ),
-                  ),
-                );
+                  );
+                } else {
+                  return const Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('No data available'),
+                    ),
+                  );
+                }
               },
             ),
           ),
