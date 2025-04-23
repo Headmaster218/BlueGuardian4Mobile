@@ -118,195 +118,203 @@ class _MapScreenState extends State<MapScreen> {
           ),
         ],
       ),
-      body: FlutterMap(
-        options: MapOptions(
-          center: LatLng(51.5495, -0.0280), // Updated coordinates for the map center
-          zoom: 15.0,
-        ),
-        children: [
-          TileLayer(
-            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            subdomains: ['a', 'b', 'c'],
+      body: GestureDetector(
+        onTap: () {
+          setState(() {
+            popupController.hideAllPopups(); // Close all popups when the map is tapped
+            activeMarker = null;
+          });
+        },
+        child: FlutterMap(
+          options: MapOptions(
+            center: LatLng(51.5495, -0.0280), // Updated coordinates for the map center
+            zoom: 15.0,
           ),
-          PopupMarkerLayerWidget(
-            options: PopupMarkerLayerOptions(
-              popupController: popupController,
-              markers: [
-                Marker(
-                  point: LatLng(51.5495, -0.0280), // Sensor 1 location
-                  builder: (context) => GestureDetector(
-                    onTap: () {
-                      final marker = Marker(
-                        point: LatLng(51.5495, -0.0280),
-                        builder: (_) => const SizedBox(),
-                      );
-                      setState(() {
-                        if (activeMarker == marker) {
-                          popupController.hideAllPopups(); // Hide popup if already active
-                          activeMarker = null;
-                        } else {
-                          popupController.hideAllPopups(); // Hide any other active popup
-                          popupController.togglePopup(marker); // Show this popup
-                          activeMarker = marker;
-                        }
-                      });
-                    },
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.red.withOpacity(0.5), // Red shadow
-                            blurRadius: 10,
-                            spreadRadius: 5,
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.red, // Inner red core
-                            border: Border.all(
-                              color: Colors.red[900]!, // Dark red outer ring
-                              width: 4,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Marker(
-                  point: LatLng(51.55500, -0.0344), // Sensor 2 location
-                  builder: (context) => GestureDetector(
-                    onTap: () {
-                      final marker = Marker(
-                        point: LatLng(51.55500, -0.0344),
-                        builder: (_) => const SizedBox(),
-                      );
-                      setState(() {
-                        if (activeMarker == marker) {
-                          popupController.hideAllPopups(); // Hide popup if already active
-                          activeMarker = null;
-                        } else {
-                          popupController.hideAllPopups(); // Hide any other active popup
-                          popupController.togglePopup(marker); // Show this popup
-                          activeMarker = marker;
-                        }
-                      });
-                    },
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.red.withOpacity(0.5), // Red shadow
-                            blurRadius: 10,
-                            spreadRadius: 5,
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.red, // Inner red core
-                            border: Border.all(
-                              color: Colors.red[900]!, // Dark red outer ring
-                              width: 4,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Marker(
-                  point: LatLng(51.54190, -0.02150), // Sensor 3 location
-                  builder: (context) => GestureDetector(
-                    onTap: () {
-                      final marker = Marker(
-                        point: LatLng(51.54190, -0.02150),
-                        builder: (_) => const SizedBox(),
-                      );
-                      setState(() {
-                        if (activeMarker == marker) {
-                          popupController.hideAllPopups(); // Hide popup if already active
-                          activeMarker = null;
-                        } else {
-                          popupController.hideAllPopups(); // Hide any other active popup
-                          popupController.togglePopup(marker); // Show this popup
-                          activeMarker = marker;
-                        }
-                      });
-                    },
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.red.withOpacity(0.5), // Red shadow
-                            blurRadius: 10,
-                            spreadRadius: 5,
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.red, // Inner red core
-                            border: Border.all(
-                              color: Colors.red[900]!, // Dark red outer ring
-                              width: 4,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-              popupBuilder: (context, marker) {
-                return Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text(
-                          'Sensor Data',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 8),
-                        Text('Timestamp: ${sensorData['timestamp'] ?? 'N/A'}'),
-                        Text('Dissolved Oxygen: ${sensorData['do'] ?? 'N/A'}'),
-                        Text('TDS: ${sensorData['tds'] ?? 'N/A'}'),
-                        Text('Turbidity: ${sensorData['turb'] ?? 'N/A'}'),
-                        Text('pH: ${sensorData['ph'] ?? 'N/A'}'),
-                        Text('Temperature: ${sensorData['temp'] ?? 'N/A'}'),
-                        Text('Coliform: ${sensorData['coli'] ?? 'N/A'}'),
-                      ],
-                    ),
-                  ),
-                );
-              },
+          children: [
+            TileLayer(
+              urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+              subdomains: ['a', 'b', 'c'],
             ),
-          ),
-        ],
+            PopupMarkerLayerWidget(
+              options: PopupMarkerLayerOptions(
+                popupController: popupController,
+                markers: [
+                  Marker(
+                    point: LatLng(51.5495, -0.0280), // Sensor 1 location
+                    builder: (context) => GestureDetector(
+                      onTap: () {
+                        final marker = Marker(
+                          point: LatLng(51.5495, -0.0280),
+                          builder: (_) => const SizedBox(),
+                        );
+                        setState(() {
+                          if (activeMarker == marker) {
+                            popupController.hideAllPopups(); // Hide popup if already active
+                            activeMarker = null;
+                          } else {
+                            popupController.hideAllPopups(); // Hide any other active popup
+                            popupController.togglePopup(marker); // Show this popup
+                            activeMarker = marker;
+                          }
+                        });
+                      },
+                      child: Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.red.withOpacity(0.5), // Red shadow
+                              blurRadius: 10,
+                              spreadRadius: 5,
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Container(
+                            width: 20,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.red, // Inner red core
+                              border: Border.all(
+                                color: Colors.red[900]!, // Dark red outer ring
+                                width: 4,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Marker(
+                    point: LatLng(51.55500, -0.0344), // Sensor 2 location
+                    builder: (context) => GestureDetector(
+                      onTap: () {
+                        final marker = Marker(
+                          point: LatLng(51.55500, -0.0344),
+                          builder: (_) => const SizedBox(),
+                        );
+                        setState(() {
+                          if (activeMarker == marker) {
+                            popupController.hideAllPopups(); // Hide popup if already active
+                            activeMarker = null;
+                          } else {
+                            popupController.hideAllPopups(); // Hide any other active popup
+                            popupController.togglePopup(marker); // Show this popup
+                            activeMarker = marker;
+                          }
+                        });
+                      },
+                      child: Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.red.withOpacity(0.5), // Red shadow
+                              blurRadius: 10,
+                              spreadRadius: 5,
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Container(
+                            width: 20,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.red, // Inner red core
+                              border: Border.all(
+                                color: Colors.red[900]!, // Dark red outer ring
+                                width: 4,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Marker(
+                    point: LatLng(51.54190, -0.02150), // Sensor 3 location
+                    builder: (context) => GestureDetector(
+                      onTap: () {
+                        final marker = Marker(
+                          point: LatLng(51.54190, -0.02150),
+                          builder: (_) => const SizedBox(),
+                        );
+                        setState(() {
+                          if (activeMarker == marker) {
+                            popupController.hideAllPopups(); // Hide popup if already active
+                            activeMarker = null;
+                          } else {
+                            popupController.hideAllPopups(); // Hide any other active popup
+                            popupController.togglePopup(marker); // Show this popup
+                            activeMarker = marker;
+                          }
+                        });
+                      },
+                      child: Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.red.withOpacity(0.5), // Red shadow
+                              blurRadius: 10,
+                              spreadRadius: 5,
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Container(
+                            width: 20,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.red, // Inner red core
+                              border: Border.all(
+                                color: Colors.red[900]!, // Dark red outer ring
+                                width: 4,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+                popupBuilder: (context, marker) {
+                  return Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            'Sensor Data',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8),
+                          Text('Timestamp: ${sensorData['timestamp'] ?? 'N/A'}'),
+                          Text('Dissolved Oxygen: ${sensorData['do'] ?? 'N/A'}'),
+                          Text('TDS: ${sensorData['tds'] ?? 'N/A'}'),
+                          Text('Turbidity: ${sensorData['turb'] ?? 'N/A'}'),
+                          Text('pH: ${sensorData['ph'] ?? 'N/A'}'),
+                          Text('Temperature: ${sensorData['temp'] ?? 'N/A'}'),
+                          Text('Coliform: ${sensorData['coli'] ?? 'N/A'}'),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
