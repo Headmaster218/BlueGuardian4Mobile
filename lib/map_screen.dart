@@ -18,7 +18,7 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   late MqttServerClient client;
   final PopupController popupController = PopupController();
-  final Map<String, Map<String, dynamic>> sensorData = {}; // Store real-time data for each marker
+  final Map<String, dynamic> sensorData = {}; // Store real-time data for each marker
 
   @override
   void initState() {
@@ -33,11 +33,20 @@ class _MapScreenState extends State<MapScreen> {
     client.onDisconnected = _onDisconnected;
     client.onSubscribed = _onSubscribed;
 
-    client.updates?.listen((List<MqttReceivedMessage<MqttMessage>> messages) {
-      final MqttPublishMessage message = messages[0].payload as MqttPublishMessage;
-      final payload = MqttPublishPayload.bytesToStringAsString(message.payload.message);
-      _onMessage(payload); // Handle incoming message
-    });
+    // 等待连接成功后再订阅主题
+    client.onConnected = () async {
+      print('Connected to MQTT server');
+      client.subscribe('AQ/send', MqttQos.atMostOnce);
+      client.subscribe('AQ/request', MqttQos.atMostOnce);
+      client.subscribe('AQ/response', MqttQos.atMostOnce);
+      print('Subscribed to topics: AQ/send, AQ/request, AQ/response');
+      client.updates?.listen((List<MqttReceivedMessage<MqttMessage>> messages) {
+        final MqttPublishMessage message = messages[0].payload as MqttPublishMessage;
+        final payload = MqttPublishPayload.bytesToStringAsString(message.payload.message);
+        print('Received message: $payload');
+        _onMessage(payload); // 处理接收到的消息
+      });
+    };
 
     try {
       await client.connect();
@@ -50,21 +59,21 @@ class _MapScreenState extends State<MapScreen> {
   void _onMessage(String payload) {
     try {
       final parts = payload.split(',');
-      final id = parts[0]; // Sensor ID
       final data = {
-        'timestamp': parts[1],
-        'do': parts[2],
-        'tds': parts[3],
-        'turb': parts[4],
-        'ph': parts[5],
-        'temp': parts[6],
+        'timestamp': parts[0],
+        'do': parts[1],
+        'tds': parts[2],
+        'turb': parts[3],
+        'ph': parts[4],
+        'temp': parts[5],
+        'coli': parts[6],
       };
 
       setState(() {
-        sensorData[id] = data; // Update sensor data
+        sensorData.addAll(data); // Update sensor data
       });
 
-      print('Updated data for sensor $id: $data');
+      print('Updated data $data');
     } catch (e) {
       print('Failed to parse message: $e');
     }
@@ -241,38 +250,28 @@ class _MapScreenState extends State<MapScreen> {
                 ),
               ],
               popupBuilder: (context, marker) {
-                final id = marker.point.toString();
-                final data = sensorData[id];
-                if (data != null) {
-                  return Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text(
-                            'Sensor Data',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 8),
-                          Text('Timestamp: ${data['timestamp']}'),
-                          Text('DO: ${data['do']}'),
-                          Text('TDS: ${data['tds']}'),
-                          Text('Turb: ${data['turb']}'),
-                          Text('pH: ${data['ph']}'),
-                          Text('Temp: ${data['temp']}'),
-                        ],
-                      ),
+                return Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          'Sensor Data',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        Text('Timestamp: ${sensorData['timestamp'] ?? 'N/A'}'),
+                        Text('Dissolved Oxygen: ${sensorData['do'] ?? 'N/A'}'),
+                        Text('TDS: ${sensorData['tds'] ?? 'N/A'}'),
+                        Text('Turbidity: ${sensorData['turb'] ?? 'N/A'}'),
+                        Text('pH: ${sensorData['ph'] ?? 'N/A'}'),
+                        Text('Temperature: ${sensorData['temp'] ?? 'N/A'}'),
+                        Text('Coliform: ${sensorData['coli'] ?? 'N/A'}'),
+                      ],
                     ),
-                  );
-                } else {
-                  return const Card(
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text('No data available'),
-                    ),
-                  );
-                }
+                  ),
+                );
               },
             ),
           ),
