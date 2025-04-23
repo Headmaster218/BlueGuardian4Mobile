@@ -19,6 +19,7 @@ class _MapScreenState extends State<MapScreen> {
   late MqttServerClient client;
   final PopupController popupController = PopupController();
   final Map<String, dynamic> sensorData = {}; // Store real-time data for each marker
+  Marker? activeMarker; // Track the currently active marker
 
   @override
   void initState() {
@@ -134,12 +135,22 @@ class _MapScreenState extends State<MapScreen> {
                 Marker(
                   point: LatLng(51.5495, -0.0280), // Sensor 1 location
                   builder: (context) => GestureDetector(
-                    onTap: () => popupController.togglePopup(
-                      Marker(
+                    onTap: () {
+                      final marker = Marker(
                         point: LatLng(51.5495, -0.0280),
                         builder: (_) => const SizedBox(),
-                      ),
-                    ),
+                      );
+                      setState(() {
+                        if (activeMarker == marker) {
+                          popupController.hideAllPopups(); // Hide popup if already active
+                          activeMarker = null;
+                        } else {
+                          popupController.hideAllPopups(); // Hide any other active popup
+                          popupController.togglePopup(marker); // Show this popup
+                          activeMarker = marker;
+                        }
+                      });
+                    },
                     child: Container(
                       width: 30,
                       height: 30,
@@ -173,12 +184,22 @@ class _MapScreenState extends State<MapScreen> {
                 Marker(
                   point: LatLng(51.55500, -0.0344), // Sensor 2 location
                   builder: (context) => GestureDetector(
-                    onTap: () => popupController.togglePopup(
-                      Marker(
+                    onTap: () {
+                      final marker = Marker(
                         point: LatLng(51.55500, -0.0344),
                         builder: (_) => const SizedBox(),
-                      ),
-                    ),
+                      );
+                      setState(() {
+                        if (activeMarker == marker) {
+                          popupController.hideAllPopups(); // Hide popup if already active
+                          activeMarker = null;
+                        } else {
+                          popupController.hideAllPopups(); // Hide any other active popup
+                          popupController.togglePopup(marker); // Show this popup
+                          activeMarker = marker;
+                        }
+                      });
+                    },
                     child: Container(
                       width: 30,
                       height: 30,
@@ -212,12 +233,22 @@ class _MapScreenState extends State<MapScreen> {
                 Marker(
                   point: LatLng(51.54190, -0.02150), // Sensor 3 location
                   builder: (context) => GestureDetector(
-                    onTap: () => popupController.togglePopup(
-                      Marker(
+                    onTap: () {
+                      final marker = Marker(
                         point: LatLng(51.54190, -0.02150),
                         builder: (_) => const SizedBox(),
-                      ),
-                    ),
+                      );
+                      setState(() {
+                        if (activeMarker == marker) {
+                          popupController.hideAllPopups(); // Hide popup if already active
+                          activeMarker = null;
+                        } else {
+                          popupController.hideAllPopups(); // Hide any other active popup
+                          popupController.togglePopup(marker); // Show this popup
+                          activeMarker = marker;
+                        }
+                      });
+                    },
                     child: Container(
                       width: 30,
                       height: 30,
