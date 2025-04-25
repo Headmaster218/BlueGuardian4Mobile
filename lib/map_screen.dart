@@ -288,25 +288,31 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ],
                 popupBuilder: (context, marker) {
-                  return Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text(
-                            'Sensor Data',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 8),
-                          Text('Timestamp: ${sensorData['timestamp'] ?? 'N/A'}'),
-                          Text('Dissolved Oxygen: ${sensorData['do'] ?? 'N/A'}'),
-                          Text('TDS: ${sensorData['tds'] ?? 'N/A'}'),
-                          Text('Turbidity: ${sensorData['turb'] ?? 'N/A'}'),
-                          Text('pH: ${sensorData['ph'] ?? 'N/A'}'),
-                          Text('Temperature: ${sensorData['temp'] ?? 'N/A'}'),
-                          Text('Coliform: ${sensorData['coli'] ?? 'N/A'}'),
-                        ],
+                  return ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 250), // Limit the popup width
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start, // Align content to the left
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Center( // Center-align the title
+                              child: Text(
+                                'Sensor Data',
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text('Timestamp: ${sensorData['timestamp'] ?? 'N/A'}'),
+                            Text('Dissolved Oxygen: ${sensorData['do'] ?? 'N/A'}'),
+                            Text('TDS: ${sensorData['tds'] ?? 'N/A'}'),
+                            Text('Turbidity: ${sensorData['turb'] ?? 'N/A'}'),
+                            Text('pH: ${sensorData['ph'] ?? 'N/A'}'),
+                            Text('Temperature: ${sensorData['temp'] ?? 'N/A'}'),
+                            Text('Coliform: ${sensorData['coli'] ?? 'N/A'}'),
+                          ],
+                        ),
                       ),
                     ),
                   );
