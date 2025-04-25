@@ -28,7 +28,7 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _connectToMqtt() async {
-    client = MqttServerClient('192.168.137.1', 'flutter_client');
+    client = MqttServerClient('127.0.0.1', 'flutter_client');
     client.logging(on: true);
     client.onConnected = _onConnected;
     client.onDisconnected = _onDisconnected;
@@ -304,7 +304,7 @@ class _MapScreenState extends State<MapScreen> {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            Text('Timestamp: ${sensorData['timestamp'] ?? 'N/A'}'),
+                            Text('${sensorData['timestamp'] ?? 'N/A'}'),
                             Text('Dissolved Oxygen: ${sensorData['do'] ?? 'N/A'}'),
                             Text('TDS: ${sensorData['tds'] ?? 'N/A'}'),
                             Text('Turbidity: ${sensorData['turb'] ?? 'N/A'}'),
