@@ -16,6 +16,7 @@ class SensorScreen extends StatefulWidget {
 class _SensorScreenState extends State<SensorScreen> {
   final TextEditingController _dateController = TextEditingController();
   late MqttServerClient client;
+  String _pageTitle = 'Sensor History Data'; // Add a variable to track the page title
 
   @override
   void initState() {
@@ -126,6 +127,12 @@ class _SensorScreenState extends State<SensorScreen> {
     });
   }
 
+  void _updatePageTitle(String sensorName) {
+    setState(() {
+      _pageTitle = sensorName; // Update the page title
+    });
+  }
+
   @override
   void dispose() {
     if (client.connectionStatus?.state == MqttConnectionState.connected) {
@@ -140,7 +147,7 @@ class _SensorScreenState extends State<SensorScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sensor Data'),
+        title: Text(_pageTitle), // Use the updated page title
       ),
       body: Column(
         children: [
@@ -203,9 +210,10 @@ class _SensorScreenState extends State<SensorScreen> {
             children: [
               Expanded(
                 child: SizedBox(
-                  height: MediaQuery.of(context).size.width / 4, // Make height equal to width for square buttons
+                  height: MediaQuery.of(context).size.width / 6, // Make height equal to width for square buttons
                   child: ElevatedButton(
                     onPressed: () {
+                      _updatePageTitle('Sensor 1 History Data'); // Update title to Sensor 1
                       _showSensorChangeMessage(context, 'Sensor 1');
                     },
                     child: const Text(
@@ -217,9 +225,10 @@ class _SensorScreenState extends State<SensorScreen> {
               ),
               Expanded(
                 child: SizedBox(
-                  height: MediaQuery.of(context).size.width / 4, // Make height equal to width for square buttons
+                  height: MediaQuery.of(context).size.width / 6, // Make height equal to width for square buttons
                   child: ElevatedButton(
                     onPressed: () {
+                      _updatePageTitle('Sensor 2 History Data'); // Update title to Sensor 2
                       _showSensorChangeMessage(context, 'Sensor 2');
                     },
                     child: const Text(
@@ -231,9 +240,10 @@ class _SensorScreenState extends State<SensorScreen> {
               ),
               Expanded(
                 child: SizedBox(
-                  height: MediaQuery.of(context).size.width / 4, // Make height equal to width for square buttons
+                  height: MediaQuery.of(context).size.width / 6, // Make height equal to width for square buttons
                   child: ElevatedButton(
                     onPressed: () {
+                      _updatePageTitle('Sensor 3 History Data'); // Update title to Sensor 3
                       _showSensorChangeMessage(context, 'Sensor 3');
                     },
                     child: const Text(
