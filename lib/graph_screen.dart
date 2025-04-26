@@ -4,6 +4,7 @@ import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:fl_chart/fl_chart.dart'; // Add this dependency for charts
 import 'dart:convert'; // Added for JSON encoding and decoding
+import 'package:shared_preferences/shared_preferences.dart'; // Added for SharedPreferences
 
 List<dynamic> sensorsData = [];
 String _pageTitle = 'Sensor 1 Graphic view'; // Add a variable to track the page title

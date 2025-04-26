@@ -4,6 +4,8 @@ import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'dart:convert'; // Added for JSON encoding and decoding
 import 'graph_screen.dart'; // Import the graph screen
+import 'package:shared_preferences/shared_preferences.dart'; // Added for SharedPreferences
+
 
 List<dynamic> sensorsData = [];
 
