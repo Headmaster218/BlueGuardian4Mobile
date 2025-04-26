@@ -6,6 +6,7 @@ import 'package:fl_chart/fl_chart.dart'; // Add this dependency for charts
 import 'dart:convert'; // Added for JSON encoding and decoding
 
 List<dynamic> sensorsData = [];
+String _pageTitle = 'Sensor 1 Graphic view'; // Add a variable to track the page title
 
 class GraphScreen extends StatefulWidget {
   const GraphScreen({super.key});
@@ -19,7 +20,6 @@ class _GraphScreenState extends State<GraphScreen> {
   final List<DateTime> _timePoints = [];
   late DateTime _currentDateTime;
   late MqttServerClient client;
-  String _pageTitle = 'Sensor 1 Graphic view'; // Add a variable to track the page title
 
   @override
   void initState() {

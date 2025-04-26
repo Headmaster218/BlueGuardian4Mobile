@@ -5,6 +5,7 @@ import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart'; // Adde
 import 'sensor_screen.dart'; // Import the new sensor screen
 import 'package:mqtt_client/mqtt_client.dart'; // Added for MQTT
 import 'package:mqtt_client/mqtt_server_client.dart'; // Added for MQTT server client
+import 'dart:convert'; // Added for JSON encoding and decoding
 
 class MapScreen extends StatefulWidget {
   final String riverName;
@@ -59,7 +60,7 @@ class _MapScreenState extends State<MapScreen> {
 
   void _onMessage(String payload) {
     try {
-      final parts = payload.split(',');
+      final parts = jsonDecode(payload) as List<dynamic>;
       final data = {
         'timestamp': parts[0],
         'do': parts[1],
@@ -296,21 +297,21 @@ class _MapScreenState extends State<MapScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start, // Align content to the left
                           mainAxisSize: MainAxisSize.min,
-                          children: [
+                            children: [
                             const Center( // Center-align the title
                               child: Text(
-                                'Sensor Data',
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              'Sensor Data',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                               ),
                             ),
                             const SizedBox(height: 8),
-                            Text('${sensorData['timestamp'] ?? 'N/A'}'),
-                            Text('Dissolved Oxygen: ${sensorData['do'] ?? 'N/A'}'),
-                            Text('TDS: ${sensorData['tds'] ?? 'N/A'}'),
-                            Text('Turbidity: ${sensorData['turb'] ?? 'N/A'}'),
-                            Text('pH: ${sensorData['ph'] ?? 'N/A'}'),
-                            Text('Temperature: ${sensorData['temp'] ?? 'N/A'}'),
-                            Text('Coliform: ${sensorData['coli'] ?? 'N/A'}'),
+                            Text('           ${sensorData['timestamp'] ?? 'N/A'}'),
+                            Text('D.O.:    ${sensorData['do'] ?? 'N/A'} mg/L'),
+                            Text('TDS:    ${sensorData['tds'] ?? 'N/A'} ppm'),
+                            Text('Turb:    ${sensorData['turb'] ?? 'N/A'} NTU'),
+                            Text('pH:       ${sensorData['ph'] ?? 'N/A'}'),
+                            Text('Temp:  ${sensorData['temp'] ?? 'N/A'} °C'),
+                            Text('Coli:     ${sensorData['coli'] ?? 'N/A'} CFU/100mL'),
                           ],
                         ),
                       ),
