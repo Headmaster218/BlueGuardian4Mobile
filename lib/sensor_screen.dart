@@ -6,7 +6,6 @@ import 'dart:convert'; // Added for JSON encoding and decoding
 import 'graph_screen.dart'; // Import the graph screen
 import 'package:shared_preferences/shared_preferences.dart'; // Added for SharedPreferences
 
-
 List<dynamic> sensorsData = [];
 
 class SensorScreen extends StatefulWidget {
@@ -56,9 +55,15 @@ class _SensorScreenState extends State<SensorScreen> {
 
     try {
       await client.connect();
+      if (client.connectionStatus?.state != MqttConnectionState.connected) {
+        throw Exception('Failed to connect to MQTT server');
+      }
     } catch (e) {
       print('MQTT connection failed: $e');
       client.disconnect();
+      setState(() {
+        _pageTitle = 'Connection Failed'; // Update the title to indicate failure
+      });
     }
   }
 
