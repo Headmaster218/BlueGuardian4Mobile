@@ -21,7 +21,6 @@ class _GraphScreenState extends State<GraphScreen> {
   late MqttServerClient client;
   String _pageTitle = 'Sensor 1 Graphic view'; // Add a variable to track the page title
 
-
   @override
   void initState() {
     super.initState();
@@ -46,7 +45,7 @@ class _GraphScreenState extends State<GraphScreen> {
         final payload = MqttPublishPayload.bytesToStringAsString(message.payload.message);
         _onMessage(payload); // 处理接收到的消息
       });
-          _sendDate(DateFormat('yyyy-MM-dd').format(_currentDateTime));
+      _sendDate(DateFormat('yyyy-MM-dd').format(_currentDateTime));
     };
 
     try {
@@ -60,12 +59,10 @@ class _GraphScreenState extends State<GraphScreen> {
   void _onMessage(String payload) {
     try {
       sensorsData = jsonDecode(payload);
-
     } catch (e) {
       print('Failed to parse message: $e'); // Use a high log level for errors
     }
   }
-
 
   void _onConnected() {
     print('Connected to MQTT server');
@@ -121,7 +118,6 @@ class _GraphScreenState extends State<GraphScreen> {
     });
   }
 
-
   DateTime _getRoundedCurrentHour() {
     final now = DateTime.now();
     return DateTime(now.year, now.month, now.day, now.hour); // Round down to the nearest hour
@@ -147,6 +143,39 @@ class _GraphScreenState extends State<GraphScreen> {
     return DateFormat('HH:00').format(dateTime); // Format for the time
   }
 
+  List<FlSpot> _generateChartData(int index) {
+    // Generate chart data for the given index from sensorsData
+    List<FlSpot> chartData = [];
+    if (sensorsData.isEmpty) return chartData;
+
+    // Find the closest index in sensorsData to the current time
+    int closestIndex = sensorsData.indexWhere((data) {
+      final time = DateTime.parse(data[0]);
+      return time.isAtSameMomentAs(_currentDateTime);
+    });
+
+    // If no exact match, find the nearest index
+    if (closestIndex == -1) {
+      closestIndex = sensorsData.indexWhere((data) {
+        final time = DateTime.parse(data[0]);
+        return time.isAfter(_currentDateTime);
+      });
+      if (closestIndex == -1) closestIndex = sensorsData.length - 1; // Use the last index if no match
+    }
+
+    // Extract seven data points centered around the closest index
+    int start = (closestIndex - 3).clamp(0, sensorsData.length - 1);
+    int end = (closestIndex + 3).clamp(0, sensorsData.length - 1);
+
+    for (int i = start; i <= end; i++) {
+      final time = DateTime.parse(sensorsData[i][0]); // First item is the timestamp
+      final value = sensorsData[i][index + 1]; // Subsequent items are sensor values
+      chartData.add(FlSpot(time.millisecondsSinceEpoch.toDouble(), value.toDouble()));
+    }
+
+    return chartData;
+  }
+
   void _onScrollEnd() {
     final centerOffset = _scrollController.offset + MediaQuery.of(context).size.width / 2 - 68 * 3.4;
     final closestIndex = (centerOffset / 68).round();
@@ -169,6 +198,26 @@ class _GraphScreenState extends State<GraphScreen> {
   }
 
   Widget _buildLineChart(String title, List<FlSpot> dataPoints) {
+    if (dataPoints.isEmpty) {
+      return Card(
+        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Text(
+              'No data available',
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Calculate minY and maxY with 20% padding
+    final double minY = dataPoints.map((e) => e.y).reduce((a, b) => a < b ? a : b);
+    final double maxY = dataPoints.map((e) => e.y).reduce((a, b) => a > b ? a : b);
+    final double padding = (maxY - minY) * 0.2; // 20% of the range
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: Padding(
@@ -184,10 +233,14 @@ class _GraphScreenState extends State<GraphScreen> {
               height: 200,
               child: LineChart(
                 LineChartData(
+                  minY: minY - padding, // Apply dynamic padding to the lower bound
+                  maxY: maxY + padding, // Apply dynamic padding to the upper bound
                   gridData: FlGridData(show: true),
                   titlesData: FlTitlesData(
-                    leftTitles: SideTitles(showTitles: true), // Use SideTitles directly
-                    bottomTitles: SideTitles(showTitles: false), // Hide horizontal axis titles
+                    leftTitles: SideTitles(showTitles: true), // Show left axis titles
+                    bottomTitles: SideTitles(showTitles: false), // Hide bottom axis titles
+                    topTitles: SideTitles(showTitles: false), // Hide top axis titles
+                    rightTitles: SideTitles(showTitles: false), // Hide right axis titles
                   ),
                   borderData: FlBorderData(show: true),
                   lineBarsData: [
@@ -209,17 +262,13 @@ class _GraphScreenState extends State<GraphScreen> {
     );
   }
 
-  List<FlSpot> _generateDummyData() {
-    // Generate 5 dummy data points for demonstration
-    return List.generate(5, (index) => FlSpot(index.toDouble(), (index * 2).toDouble()));
-  }
-
   @override
   void dispose() {
     if (client.connectionStatus?.state == MqttConnectionState.connected) {
       client.disconnect(); // Disconnect MQTT connection
       print('MQTT connection disconnected');
     }
+    sensorsData.clear(); // Clear the sensors data
     _scrollController.dispose();
     super.dispose();
   }
@@ -316,12 +365,12 @@ class _GraphScreenState extends State<GraphScreen> {
           Expanded(
             child: ListView(
               children: [
-                _buildLineChart('Dissolved Oxygen (DO)', _generateDummyData()),
-                _buildLineChart('Total Dissolved Solids (TDS)', _generateDummyData()),
-                _buildLineChart('Turbidity (Turb)', _generateDummyData()),
-                _buildLineChart('pH Level', _generateDummyData()),
-                _buildLineChart('Temperature (Temp)', _generateDummyData()),
-                _buildLineChart('Coliform (Coli)', _generateDummyData()),
+                _buildLineChart('Dissolved Oxygen (DO)', _generateChartData(0)),
+                _buildLineChart('Total Dissolved Solids (TDS)', _generateChartData(1)),
+                _buildLineChart('Turbidity (Turb)', _generateChartData(2)),
+                _buildLineChart('pH Level', _generateChartData(3)),
+                _buildLineChart('Temperature (Temp)', _generateChartData(4)),
+                _buildLineChart('Coliform (Coli)', _generateChartData(5)),
               ],
             ),
           ),
