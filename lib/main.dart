@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart'; // Added for Navigator
 import 'map_screen.dart'; // Import the new map screen
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
