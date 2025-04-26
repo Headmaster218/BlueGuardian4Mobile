@@ -197,6 +197,26 @@ class _GraphScreenState extends State<GraphScreen> {
     }
   }
 
+double _xOffset = 0.0; // Add a variable to track the scroll offset
+
+void _onScrollUpdate() {
+  final screenWidth = MediaQuery.of(context).size.width;
+  final itemWidth = 68.0; // 每个时间格子宽度（你的设定）
+
+  final centerOffset = _scrollController.offset + screenWidth / 2 - itemWidth * 3.4;
+  final closestIndex = (centerOffset / itemWidth).round();
+
+  if (closestIndex >= 0 && closestIndex < _timePoints.length) {
+    setState(() {
+      _currentDateTime = _timePoints[closestIndex];
+      _xOffset = (centerOffset - (closestIndex * itemWidth)) / itemWidth * 3600000; 
+      // 说明：一小时3600000毫秒，线性比例偏移
+    });
+  }
+}
+
+
+
   Widget _buildLineChart(String title, List<FlSpot> dataPoints) {
     if (dataPoints.isEmpty) {
       return Card(
@@ -284,11 +304,16 @@ class _GraphScreenState extends State<GraphScreen> {
           // Time bar with pre-generated time points
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0), // 只留左右，不留上下！
-            child: NotificationListener<ScrollEndNotification>(
-              onNotification: (notification) {
-                _onScrollEnd(); // Trigger selection when scrolling stops
-                return true;
-              },
+            child: NotificationListener<ScrollNotification>(
+  onNotification: (notification) {
+    if (notification is ScrollUpdateNotification) {
+      _onScrollUpdate();
+    } else if (notification is ScrollEndNotification) {
+      _onScrollEnd();
+    }
+    return true;
+  },
+
               child: Stack(
                 alignment: Alignment.center,
                 children: [
