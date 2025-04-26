@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart'; // Added for map functionality
 import 'package:latlong2/latlong.dart'; // Added for LatLng
 import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart'; // Added for marker popups
+import 'package:shared_preferences/shared_preferences.dart';
 import 'sensor_screen.dart'; // Import the new sensor screen
 import 'package:mqtt_client/mqtt_client.dart'; // Added for MQTT
 import 'package:mqtt_client/mqtt_server_client.dart'; // Added for MQTT server client
@@ -29,7 +30,12 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _connectToMqtt() async {
-    client = MqttServerClient('127.0.0.1', 'flutter_client');
+    final prefs = await SharedPreferences.getInstance();
+    final mqttIp = prefs.getString('mqtt_ip')!;
+    final mqttPort = int.parse(prefs.getString('mqtt_port')!);
+
+    client = MqttServerClient(mqttIp, 'flutter_client');
+    client.port = mqttPort;
     client.logging(on: true);
     client.onConnected = _onConnected;
     client.onDisconnected = _onDisconnected;
