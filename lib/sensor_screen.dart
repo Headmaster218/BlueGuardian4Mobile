@@ -29,7 +29,12 @@ class _SensorScreenState extends State<SensorScreen> {
   }
 
   Future<void> _connectToMqtt() async {
-    client = MqttServerClient('127.0.0.1', 'flutter_client');
+    final prefs = await SharedPreferences.getInstance();
+    final mqttIp = prefs.getString('mqtt_ip')!;
+    final mqttPort = int.parse(prefs.getString('mqtt_port')!);
+
+    client = MqttServerClient(mqttIp, 'flutter_client');
+    client.port = mqttPort;
     client.logging(on: true);
     client.onConnected = _onConnected;
     client.onDisconnected = _onDisconnected;

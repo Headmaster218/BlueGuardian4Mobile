@@ -1,11 +1,24 @@
 import 'package:flutter/material.dart';
 import 'dart:async'; // Added for Timer
 import 'package:flutter/widgets.dart'; // Added for Navigator
+import 'package:shared_preferences/shared_preferences.dart'; // Added for SharedPreferences
 import 'map_screen.dart'; // Import the new map screen
+import 'settings_page.dart'; // Import the new settings page
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await _initializeDefaultSettings(); // Initialize default settings
   runApp(const MyApp());
+}
+
+Future<void> _initializeDefaultSettings() async {
+  final prefs = await SharedPreferences.getInstance();
+  if (!prefs.containsKey('mqtt_ip')) {
+    await prefs.setString('mqtt_ip', '127.0.0.1'); // Default IP
+  }
+  if (!prefs.containsKey('mqtt_port')) {
+    await prefs.setString('mqtt_port', '1883'); // Default Port
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -132,6 +145,16 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const SettingsPage()),
+              );
+            },
+          ),
+        ],
       ),
       body: Center(
         child: GridView.count(
