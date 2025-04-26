@@ -134,6 +134,13 @@ class _SensorScreenState extends State<SensorScreen> {
     });
   }
 
+  void _clearDataAndResetDate() {
+    setState(() {
+      sensorsData.clear(); // Clear the sensorsData list
+      // _dateController.text = ''; // Reset the date input field
+    });
+  }
+
   @override
   void dispose() {
     if (client.connectionStatus?.state == MqttConnectionState.connected) {
@@ -210,7 +217,7 @@ class _SensorScreenState extends State<SensorScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Timestamp: ${data[0]}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                Text('                            ${data[0]}', style: const TextStyle(fontWeight: FontWeight.bold)),
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [
@@ -251,6 +258,7 @@ class _SensorScreenState extends State<SensorScreen> {
                   height: MediaQuery.of(context).size.width / 6, // Make height equal to width for square buttons
                   child: ElevatedButton(
                     onPressed: () {
+                      _clearDataAndResetDate(); // Clear data and reset date
                       _updatePageTitle('Sensor 1 History Data'); // Update title to Sensor 1
                       _showSensorChangeMessage(context, 'Sensor 1');
                     },
@@ -266,6 +274,7 @@ class _SensorScreenState extends State<SensorScreen> {
                   height: MediaQuery.of(context).size.width / 6, // Make height equal to width for square buttons
                   child: ElevatedButton(
                     onPressed: () {
+                      _clearDataAndResetDate(); // Clear data and reset date
                       _updatePageTitle('Sensor 2 History Data'); // Update title to Sensor 2
                       _showSensorChangeMessage(context, 'Sensor 2');
                     },
@@ -281,6 +290,7 @@ class _SensorScreenState extends State<SensorScreen> {
                   height: MediaQuery.of(context).size.width / 6, // Make height equal to width for square buttons
                   child: ElevatedButton(
                     onPressed: () {
+                      _clearDataAndResetDate(); // Clear data and reset date
                       _updatePageTitle('Sensor 3 History Data'); // Update title to Sensor 3
                       _showSensorChangeMessage(context, 'Sensor 3');
                     },
