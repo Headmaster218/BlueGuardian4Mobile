@@ -115,12 +115,25 @@ class _GraphScreenState extends State<GraphScreen> {
   void _updatePageTitle(String sensorName) {
     setState(() {
       _pageTitle = sensorName; // Update the page title
+      sensorsData.clear(); // Clear the current sensor data
+      _sendDate(DateFormat('yyyy-MM-dd').format(_currentDateTime)); // Reload data for the selected sensor
+      // Force a rebuild by changing the widget's key
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (_, __, ___) => GraphScreen(key: UniqueKey()),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
+      });
     });
   }
 
   DateTime _getRoundedCurrentHour() {
     final now = DateTime.now();
-    return DateTime(now.year, now.month, now.day, now.hour); // Round down to the nearest hour
+    return DateTime(now.year, now.month, now.day, now.hour).subtract(const Duration(hours: 3)); // Set to three hours earlier
   }
 
   void _generateTimePoints() {
