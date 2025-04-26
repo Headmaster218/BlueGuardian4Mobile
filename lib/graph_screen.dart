@@ -70,6 +70,52 @@ class _GraphScreenState extends State<GraphScreen> {
     }
   }
 
+  Widget _buildLineChart(String title, List<FlSpot> dataPoints) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(
+              height: 200,
+              child: LineChart(
+                LineChartData(
+                  gridData: FlGridData(show: true),
+                  titlesData: FlTitlesData(
+                    leftTitles: SideTitles(showTitles: true), // Use SideTitles directly
+                    bottomTitles: SideTitles(showTitles: false), // Hide horizontal axis titles
+                  ),
+                  borderData: FlBorderData(show: true),
+                  lineBarsData: [
+                    LineChartBarData(
+                      spots: dataPoints,
+                      isCurved: true,
+                      colors: [Colors.blue],
+                      barWidth: 4,
+                      isStrokeCapRound: true,
+                      belowBarData: BarAreaData(show: false),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<FlSpot> _generateDummyData() {
+    // Generate 5 dummy data points for demonstration
+    return List.generate(5, (index) => FlSpot(index.toDouble(), (index * 2).toDouble()));
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -166,11 +212,15 @@ class _GraphScreenState extends State<GraphScreen> {
             ),
           ),
           Expanded(
-            child: Center(
-              child: Text(
-                'Graph will be displayed here for ${_formatDate(_currentDateTime)} ${_formatTime(_currentDateTime)}',
-                style: const TextStyle(fontSize: 18),
-              ),
+            child: ListView(
+              children: [
+                _buildLineChart('Dissolved Oxygen (DO)', _generateDummyData()),
+                _buildLineChart('Total Dissolved Solids (TDS)', _generateDummyData()),
+                _buildLineChart('Turbidity (Turb)', _generateDummyData()),
+                _buildLineChart('pH Level', _generateDummyData()),
+                _buildLineChart('Temperature (Temp)', _generateDummyData()),
+                _buildLineChart('Coliform (Coli)', _generateDummyData()),
+              ],
             ),
           ),
           // Sensor buttons at the bottom
