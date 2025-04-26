@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // Added for date formatting
+import 'package:mqtt_client/mqtt_client.dart';
+import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:fl_chart/fl_chart.dart'; // Add this dependency for charts
+import 'dart:convert'; // Added for JSON encoding and decoding
+
+List<dynamic> sensorsData = [];
 
 class GraphScreen extends StatefulWidget {
   const GraphScreen({super.key});
@@ -13,6 +18,9 @@ class _GraphScreenState extends State<GraphScreen> {
   final ScrollController _scrollController = ScrollController();
   final List<DateTime> _timePoints = [];
   late DateTime _currentDateTime;
+  late MqttServerClient client;
+  String _pageTitle = 'Sensor 1 Graphic view'; // Add a variable to track the page title
+
 
   @override
   void initState() {
@@ -22,7 +30,97 @@ class _GraphScreenState extends State<GraphScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollController.jumpTo(_scrollController.position.maxScrollExtent); // Remove extra offset
     });
+    _connectToMqtt();
   }
+
+  Future<void> _connectToMqtt() async {
+    client = MqttServerClient('127.0.0.1', 'flutter_client');
+    client.logging(on: true);
+    client.onConnected = _onConnected;
+
+    // 等待连接成功后再订阅主题
+    client.onConnected = () async {
+      client.subscribe('AQ/response', MqttQos.atMostOnce);
+      client.updates?.listen((List<MqttReceivedMessage<MqttMessage>> messages) {
+        final MqttPublishMessage message = messages[0].payload as MqttPublishMessage;
+        final payload = MqttPublishPayload.bytesToStringAsString(message.payload.message);
+        _onMessage(payload); // 处理接收到的消息
+      });
+          _sendDate(DateFormat('yyyy-MM-dd').format(_currentDateTime));
+    };
+
+    try {
+      await client.connect();
+    } catch (e) {
+      print('MQTT connection failed: $e');
+      client.disconnect();
+    }
+  }
+
+  void _onMessage(String payload) {
+    try {
+      sensorsData = jsonDecode(payload);
+
+    } catch (e) {
+      print('Failed to parse message: $e'); // Use a high log level for errors
+    }
+  }
+
+
+  void _onConnected() {
+    print('Connected to MQTT server');
+    client.subscribe('AQ/request', MqttQos.atMostOnce);
+    client.subscribe('AQ/response', MqttQos.atMostOnce);
+    print('Subscribed to topics: AQ/send, AQ/request, AQ/response');
+  }
+
+  void _sendDate(String date) {
+    final startDate = DateFormat('yyyy-MM-dd').format(DateTime.parse(date).subtract(const Duration(days: 7)));
+    final payload = jsonEncode({
+      "start_time": startDate,
+      "end_time": date,
+    });
+    final builder = MqttClientPayloadBuilder();
+    builder.addString(payload);
+    client.publishMessage('AQ/request', MqttQos.atMostOnce, builder.payload!);
+    print('Sent payload: $payload to AQ/request');
+  }
+
+  void _showSensorChangeMessage(BuildContext context, String sensorName) {
+    final overlay = Overlay.of(context);
+    final overlayEntry = OverlayEntry(
+      builder: (context) => Center(
+        child: AnimatedOpacity(
+          opacity: 1.0,
+          duration: const Duration(milliseconds: 300),
+          child: Material(
+            color: Colors.black54,
+            borderRadius: BorderRadius.circular(8.0),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Changed to $sensorName',
+                style: const TextStyle(color: Colors.white, fontSize: 18),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+
+    Future.delayed(const Duration(seconds: 1), () {
+      overlayEntry.remove();
+    });
+  }
+
+  void _updatePageTitle(String sensorName) {
+    setState(() {
+      _pageTitle = sensorName; // Update the page title
+    });
+  }
+
 
   DateTime _getRoundedCurrentHour() {
     final now = DateTime.now();
@@ -118,6 +216,10 @@ class _GraphScreenState extends State<GraphScreen> {
 
   @override
   void dispose() {
+    if (client.connectionStatus?.state == MqttConnectionState.connected) {
+      client.disconnect(); // Disconnect MQTT connection
+      print('MQTT connection disconnected');
+    }
     _scrollController.dispose();
     super.dispose();
   }
@@ -126,7 +228,7 @@ class _GraphScreenState extends State<GraphScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Graph View'),
+        title: Text(_pageTitle), // Use the updated page title
       ),
       body: Column(
         children: [
@@ -231,7 +333,8 @@ class _GraphScreenState extends State<GraphScreen> {
                   height: MediaQuery.of(context).size.width / 6,
                   child: ElevatedButton(
                     onPressed: () {
-                      print('Sensor 1 selected');
+                      _showSensorChangeMessage(context, 'Sensor 1'); // Show sensor change message
+                      _updatePageTitle('Sensor 1 Graphic view'); // Update the page title
                     },
                     child: const Text(
                       'Sensor 1',
@@ -245,7 +348,8 @@ class _GraphScreenState extends State<GraphScreen> {
                   height: MediaQuery.of(context).size.width / 6,
                   child: ElevatedButton(
                     onPressed: () {
-                      print('Sensor 2 selected');
+                      _showSensorChangeMessage(context, 'Sensor 2'); // Show sensor change message
+                      _updatePageTitle('Sensor 2 Graphic view'); // Update the page title
                     },
                     child: const Text(
                       'Sensor 2',
@@ -259,7 +363,8 @@ class _GraphScreenState extends State<GraphScreen> {
                   height: MediaQuery.of(context).size.width / 6,
                   child: ElevatedButton(
                     onPressed: () {
-                      print('Sensor 3 selected');
+                      _showSensorChangeMessage(context, 'Sensor 3'); // Show sensor change message
+                      _updatePageTitle('Sensor 3 Graphic view'); // Update the page title
                     },
                     child: const Text(
                       'Sensor 3',
