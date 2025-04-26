@@ -3,6 +3,7 @@ import 'package:intl/intl.dart'; // Added for date formatting
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'dart:convert'; // Added for JSON encoding and decoding
+import 'graph_screen.dart'; // Import the graph screen
 
 List<dynamic> sensorsData = [];
 
@@ -149,6 +150,16 @@ class _SensorScreenState extends State<SensorScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_pageTitle), // Use the updated page title
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.show_chart), // Line chart icon
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const GraphScreen()), // Navigate to graph screen
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
