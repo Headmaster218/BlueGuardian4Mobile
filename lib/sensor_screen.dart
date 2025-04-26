@@ -16,7 +16,7 @@ class SensorScreen extends StatefulWidget {
 class _SensorScreenState extends State<SensorScreen> {
   final TextEditingController _dateController = TextEditingController();
   late MqttServerClient client;
-  String _pageTitle = 'Sensor History Data'; // Add a variable to track the page title
+  String _pageTitle = 'Sensor 1 History Data'; // Add a variable to track the page title
 
   @override
   void initState() {
@@ -120,7 +120,7 @@ class _SensorScreenState extends State<SensorScreen> {
       ),
     );
 
-    overlay?.insert(overlayEntry);
+    overlay.insert(overlayEntry);
 
     Future.delayed(const Duration(seconds: 1), () {
       overlayEntry.remove();
@@ -139,6 +139,7 @@ class _SensorScreenState extends State<SensorScreen> {
       client.disconnect(); // Disconnect MQTT connection
       print('MQTT connection disconnected');
     }
+    sensorsData.clear(); // Clear the sensorsData list
     _dateController.dispose();
     super.dispose();
   }
@@ -180,26 +181,52 @@ class _SensorScreenState extends State<SensorScreen> {
           ),
           Expanded(
             child: sensorsData.isEmpty
-                ? const Center(child: Text('No data available, please select a date'))
+                ? const Center(child: Text('Please select a date for history'))
                 : ListView.builder(
                     itemCount: sensorsData.length,
                     itemBuilder: (context, index) {
                       final data = sensorsData[index];
-                      return Card(
-                        margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Timestamp: ${data[0]}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                              Text('Dissolved Oxygen: ${data[1]}'),
-                              Text('TDS: ${data[2]}'),
-                              Text('Turbidity: ${data[3]}'),
-                              Text('pH: ${data[4]}'),
-                              Text('Temperature: ${data[5]}'),
-                              Text('Coliform: ${data[6]}'),
-                            ],
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) => const GraphScreen()), // Navigate to graph screen
+                          );
+                        },
+                        child: Card(
+                          margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 1.0),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Timestamp: ${data[0]}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text('Dissolved Oxygen: ${data[1]}'),
+                                          Text('TDS: ${data[2]}'),
+                                          Text('Turbidity: ${data[3]}'),
+                                        ],
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text('pH: ${data[4]}'),
+                                          Text('Temperature: ${data[5]}'),
+                                          Text('Coliform: ${data[6]}'),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       );
