@@ -128,7 +128,7 @@ class _MapScreenState extends State<MapScreen> {
         child: FlutterMap(
           options: MapOptions(
             center: LatLng(51.5495, -0.0280), // Updated coordinates for the map center
-            zoom: 15.0,
+            zoom: 11.0,
           ),
           children: [
             TileLayer(
