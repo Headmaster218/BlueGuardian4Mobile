@@ -4,6 +4,7 @@ import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:fl_chart/fl_chart.dart'; // Add this dependency for charts
 import 'dart:convert'; // Added for JSON encoding and decoding
+import 'dart:async';
 
 List<dynamic> sensorsData = [];
 
@@ -201,22 +202,29 @@ double _xOffset = 0.0; // Add a variable to track the scroll offset
 final double millisPerPixel = 3600000 / 68;
 
 
+Timer? _throttleTimer;
+
 void _onScrollUpdate() {
-  final screenWidth = MediaQuery.of(context).size.width;
-  final itemWidth = 68.0; // 1小时对应的像素宽度
+  if (_throttleTimer?.isActive ?? false) return; // 如果正在等待，不响应
 
-  final centerPixel = _scrollController.offset + screenWidth / 2;
-  final centerWithoutPadding = centerPixel - _getCenterOffset(); // 去掉初始padding
-  final hoursFromStart = centerWithoutPadding / itemWidth; // 浮点数小时
+  _throttleTimer = Timer(const Duration(milliseconds: 20), () {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final itemWidth = 68.0;
 
-  final DateTime newTime = _timePoints.first.add(Duration(
-    milliseconds: (hoursFromStart * 3600000).round(),
-  ));
+    final centerPixel = _scrollController.offset + screenWidth / 2;
+    final centerWithoutPadding = centerPixel - _getCenterOffset();
+    final hoursFromStart = centerWithoutPadding / itemWidth;
 
-  setState(() {
-    _currentDateTime = newTime;
+    final DateTime newTime = _timePoints.first.add(Duration(
+      milliseconds: (hoursFromStart * 3600000).round(),
+    ));
+
+    setState(() {
+      _currentDateTime = newTime;
+    });
   });
 }
+
 
 
 
