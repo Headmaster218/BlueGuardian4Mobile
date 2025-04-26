@@ -172,7 +172,11 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildGridItem(String name, String? imagePath, {bool isAddMore = false}) {
     return GestureDetector(
       onTap: () {
-        if (!isAddMore) {
+        if (isAddMore) {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => const ComingSoonScreen()),
+          );
+        } else {
           Navigator.of(context).push(
             MaterialPageRoute(builder: (context) => MapScreen(riverName: name)),
           );
@@ -229,6 +233,77 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class ComingSoonScreen extends StatelessWidget {
+  const ComingSoonScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Coming Soon'),
+      ),
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/commingsoon.png'), // Add a background image
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.construction,
+                  size: 100,
+                  color: Colors.orange,
+                ),
+                const SizedBox(height: 20),
+                Column(
+                  children: [
+                  const Text(
+                    'Coming Soon!',
+                    style: TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    shadows: [
+                      Shadow(
+                      blurRadius: 15.0,
+                      color: Colors.black87,
+                      offset: Offset(3.0, 3.0),
+                      ),
+                    ],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: const Text(
+                    'We are working hard to bring you new features. Stay tuned!',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w300,
+                      color: Colors.green,
+                    ),
+                    textAlign: TextAlign.center,
+                    ),
+                  ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
