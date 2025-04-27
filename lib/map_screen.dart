@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart'; // Added for map functionality
 import 'package:latlong2/latlong.dart'; // Added for LatLng
 import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart'; // Added for marker popups
+import 'package:shared_preferences/shared_preferences.dart';
 import 'sensor_screen.dart'; // Import the new sensor screen
 import 'package:mqtt_client/mqtt_client.dart'; // Added for MQTT
 import 'package:mqtt_client/mqtt_server_client.dart'; // Added for MQTT server client
+import 'dart:convert'; // Added for JSON encoding and decoding
 
 class MapScreen extends StatefulWidget {
   final String riverName;
@@ -28,7 +30,12 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _connectToMqtt() async {
-    client = MqttServerClient('127.0.0.1', 'flutter_client');
+    final prefs = await SharedPreferences.getInstance();
+    final mqttIp = prefs.getString('mqtt_ip')!;
+    final mqttPort = int.parse(prefs.getString('mqtt_port')!);
+
+    client = MqttServerClient(mqttIp, 'flutter_client');
+    client.port = mqttPort;
     client.logging(on: true);
     client.onConnected = _onConnected;
     client.onDisconnected = _onDisconnected;
@@ -59,7 +66,7 @@ class _MapScreenState extends State<MapScreen> {
 
   void _onMessage(String payload) {
     try {
-      final parts = payload.split(',');
+      final parts = jsonDecode(payload) as List<dynamic>;
       final data = {
         'timestamp': parts[0],
         'do': parts[1],
@@ -128,7 +135,7 @@ class _MapScreenState extends State<MapScreen> {
         child: FlutterMap(
           options: MapOptions(
             center: LatLng(51.5495, -0.0280), // Updated coordinates for the map center
-            zoom: 11.0,
+            zoom: 14.0,
           ),
           children: [
             TileLayer(
@@ -288,31 +295,59 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ],
                 popupBuilder: (context, marker) {
+                  String markerName;
+                  if (marker.point == LatLng(51.5495, -0.0280)) {
+                    markerName = 'Sensor 1 Data';
+                  } else if (marker.point == LatLng(51.55500, -0.0344)) {
+                    markerName = 'Sensor 2 Data';
+                  } else if (marker.point == LatLng(51.54190, -0.02150)) {
+                    markerName = 'Sensor 3 Data';
+                  } else {
+                    markerName = 'Unknown Sensor';
+                  }
+
                   return ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 250), // Limit the popup width
                     child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start, // Align content to the left
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Center( // Center-align the title
-                              child: Text(
-                                'Sensor Data',
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
+                      child: Stack(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start, // Align content to the left
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Center( // Center-align the title
+                                  child: Text(
+                                    markerName,
+                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text('           ${sensorData['timestamp'] ?? 'N/A'}'),
+                                Text('D.O.:    ${sensorData['do'] ?? 'N/A'} mg/L'),
+                                Text('TDS:    ${sensorData['tds'] ?? 'N/A'} ppm'),
+                                Text('Turb:    ${sensorData['turb'] ?? 'N/A'} NTU'),
+                                Text('pH:       ${sensorData['ph'] ?? 'N/A'}'),
+                                Text('Temp:  ${sensorData['temp'] ?? 'N/A'} °C'),
+                                Text('Coli:     ${sensorData['coli'] ?? 'N/A'} CFU/100mL'),
+                              ],
                             ),
-                            const SizedBox(height: 8),
-                            Text('${sensorData['timestamp'] ?? 'N/A'}'),
-                            Text('Dissolved Oxygen: ${sensorData['do'] ?? 'N/A'}'),
-                            Text('TDS: ${sensorData['tds'] ?? 'N/A'}'),
-                            Text('Turbidity: ${sensorData['turb'] ?? 'N/A'}'),
-                            Text('pH: ${sensorData['ph'] ?? 'N/A'}'),
-                            Text('Temperature: ${sensorData['temp'] ?? 'N/A'}'),
-                            Text('Coliform: ${sensorData['coli'] ?? 'N/A'}'),
-                          ],
-                        ),
+                          ),
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: IconButton(
+                              icon: const Icon(Icons.close, size: 16),
+                              onPressed: () {
+                                setState(() {
+                                  popupController.hideAllPopups(); // Close the popup when "X" is clicked
+                                  activeMarker = null;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   );

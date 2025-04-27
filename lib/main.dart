@@ -1,10 +1,24 @@
 import 'package:flutter/material.dart';
 import 'dart:async'; // Added for Timer
 import 'package:flutter/widgets.dart'; // Added for Navigator
+import 'package:shared_preferences/shared_preferences.dart'; // Added for SharedPreferences
 import 'map_screen.dart'; // Import the new map screen
+import 'settings_page.dart'; // Import the new settings page
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await _initializeDefaultSettings(); // Initialize default settings
   runApp(const MyApp());
+}
+
+Future<void> _initializeDefaultSettings() async {
+  final prefs = await SharedPreferences.getInstance();
+  if (!prefs.containsKey('mqtt_ip')) {
+    await prefs.setString('mqtt_ip', '127.0.0.1'); // Default IP
+  }
+  if (!prefs.containsKey('mqtt_port')) {
+    await prefs.setString('mqtt_port', '1883'); // Default Port
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -13,7 +27,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Aquasense',
+      title: 'BlueGuardian',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -29,27 +43,88 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 700),
+      vsync: this,
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeIn,
+    );
+    _animationController.forward();
+
     Timer(const Duration(seconds: 2), () {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const MyHomePage(title: 'Aquasense Home Page')),
+        MaterialPageRoute(builder: (context) => const MyHomePage(title: 'BlueGuardian Home Page')),
       );
     });
   }
 
   @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Image.asset(
-          'assets/Startpage.png',
-          width: double.infinity,
-          height: double.infinity,
-          fit: BoxFit.cover, // Ensures the image covers the entire screen
-        ),
+      body: Stack(
+        children: [
+          Center(
+            child: Image.asset(
+              'assets/Startpage.png',
+              width: double.infinity,
+              height: double.infinity,
+              fit: BoxFit.cover, // Ensures the image covers the entire screen
+            ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).size.height * 0.25, // Position text towards the upper part of the screen
+            left: 0,
+            right: 0,
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: Column(
+                children: [
+                  const Text(
+                    'BlueGuardian',
+                    style: TextStyle(
+                      fontSize: 50,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          blurRadius: 10.0,
+                          color: Colors.black54,
+                          offset: Offset(2.0, 2.0),
+                        ),
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Protecting Our Waters',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w300,
+                      color: Colors.white70,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -70,6 +145,16 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const SettingsPage()),
+              );
+            },
+          ),
+        ],
       ),
       body: Center(
         child: GridView.count(
@@ -87,7 +172,11 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildGridItem(String name, String? imagePath, {bool isAddMore = false}) {
     return GestureDetector(
       onTap: () {
-        if (!isAddMore) {
+        if (isAddMore) {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => const ComingSoonScreen()),
+          );
+        } else {
           Navigator.of(context).push(
             MaterialPageRoute(builder: (context) => MapScreen(riverName: name)),
           );
@@ -144,6 +233,77 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class ComingSoonScreen extends StatelessWidget {
+  const ComingSoonScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Coming Soon'),
+      ),
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/commingsoon.png'), // Add a background image
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.construction,
+                  size: 100,
+                  color: Colors.orange,
+                ),
+                const SizedBox(height: 20),
+                Column(
+                  children: [
+                  const Text(
+                    'Coming Soon!',
+                    style: TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    shadows: [
+                      Shadow(
+                      blurRadius: 15.0,
+                      color: Colors.black87,
+                      offset: Offset(3.0, 3.0),
+                      ),
+                    ],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: const Text(
+                    'We are working hard to bring you new features. Stay tuned!',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w300,
+                      color: Colors.green,
+                    ),
+                    textAlign: TextAlign.center,
+                    ),
+                  ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

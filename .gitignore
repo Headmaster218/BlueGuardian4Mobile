@@ -2,3 +2,5 @@
 build/
 
 .dart_tool/flutter_build/
+
+.DS_Store

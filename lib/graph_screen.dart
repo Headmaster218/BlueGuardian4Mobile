@@ -5,8 +5,10 @@ import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:fl_chart/fl_chart.dart'; // Add this dependency for charts
 import 'dart:convert'; // Added for JSON encoding and decoding
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart'; // Added for SharedPreferences
 
 List<dynamic> sensorsData = [];
+String _pageTitle = 'Sensor 1 Graphic view'; // Add a variable to track the page title
 
 class GraphScreen extends StatefulWidget {
   const GraphScreen({super.key});
@@ -20,7 +22,6 @@ class _GraphScreenState extends State<GraphScreen> {
   final List<DateTime> _timePoints = [];
   late DateTime _currentDateTime;
   late MqttServerClient client;
-  String _pageTitle = 'Sensor 1 Graphic view'; // Add a variable to track the page title
 
   @override
   void initState() {
@@ -34,7 +35,12 @@ class _GraphScreenState extends State<GraphScreen> {
   }
 
   Future<void> _connectToMqtt() async {
-    client = MqttServerClient('127.0.0.1', 'flutter_client');
+    final prefs = await SharedPreferences.getInstance();
+    final mqttIp = prefs.getString('mqtt_ip')!;
+    final mqttPort = int.parse(prefs.getString('mqtt_port')!);
+
+    client = MqttServerClient(mqttIp, 'flutter_client');
+    client.port = mqttPort;
     client.logging(on: true);
     client.onConnected = _onConnected;
 
@@ -116,12 +122,25 @@ class _GraphScreenState extends State<GraphScreen> {
   void _updatePageTitle(String sensorName) {
     setState(() {
       _pageTitle = sensorName; // Update the page title
+      sensorsData.clear(); // Clear the current sensor data
+      _sendDate(DateFormat('yyyy-MM-dd').format(_currentDateTime)); // Reload data for the selected sensor
+      // Force a rebuild by changing the widget's key
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (_, __, ___) => GraphScreen(key: UniqueKey()),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
+      });
     });
   }
 
   DateTime _getRoundedCurrentHour() {
     final now = DateTime.now();
-    return DateTime(now.year, now.month, now.day, now.hour); // Round down to the nearest hour
+    return DateTime(now.year, now.month, now.day, now.hour).subtract(const Duration(hours: 3)); // Set to three hours earlier
   }
 
   void _generateTimePoints() {
@@ -269,7 +288,15 @@ void _onScrollUpdate() {
                   maxY: maxY + padding, // Apply dynamic padding to the upper bound
                   gridData: FlGridData(show: true),
                   titlesData: FlTitlesData(
-                    leftTitles: SideTitles(showTitles: true), // Show left axis titles
+                    leftTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 30, // Ensure enough space for three-digit numbers
+                      getTitles: (value) {
+                        return value.toStringAsFixed(0).length > 3
+                            ? value.toStringAsFixed(0).substring(0, 3) // Limit to three digits
+                            : value.toStringAsFixed(0); // Use full value if within limit
+                      },
+                    ),
                     bottomTitles: SideTitles(showTitles: false), // Hide bottom axis titles
                     topTitles: SideTitles(showTitles: false), // Hide top axis titles
                     rightTitles: SideTitles(showTitles: false), // Hide right axis titles
@@ -340,38 +367,50 @@ void _onScrollUpdate() {
                       itemBuilder: (context, index) {
                         final dateTime = _timePoints[index];
                         final isCurrent = dateTime.isAtSameMomentAs(_currentDateTime);
-                        return Container(
-                          width: 60,
-                          margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                          decoration: BoxDecoration(
-                            color: isCurrent ? Colors.blue[50] : Colors.white,
-                            border: Border.all(
-                              color: isCurrent ? Colors.blue : Colors.grey,
-                              width: 1.5,
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _currentDateTime = dateTime; // Update the current time
+                            });
+                            _scrollController.animateTo(
+                              index * 68 - MediaQuery.of(context).size.width / 2 + 68 * 3.4,
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeOut,
+                            );
+                          },
+                          child: Container(
+                            width: 60,
+                            margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                            decoration: BoxDecoration(
+                              color: isCurrent ? Colors.blue[50] : Colors.white,
+                              border: Border.all(
+                                color: isCurrent ? Colors.blue : Colors.grey,
+                                width: 1.5,
+                              ),
+                              borderRadius: BorderRadius.circular(8.0),
                             ),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          alignment: Alignment.center,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                _formatDate(dateTime),
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
-                                  color: isCurrent ? Colors.blue : Colors.black,
+                            alignment: Alignment.center,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  _formatDate(dateTime),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                                    color: isCurrent ? Colors.blue : Colors.black,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                _formatTime(dateTime),
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
-                                  color: isCurrent ? Colors.blue : Colors.black,
+                                Text(
+                                  _formatTime(dateTime),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                                    color: isCurrent ? Colors.blue : Colors.black,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         );
                       },

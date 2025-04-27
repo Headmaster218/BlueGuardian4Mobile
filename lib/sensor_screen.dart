@@ -4,6 +4,7 @@ import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'dart:convert'; // Added for JSON encoding and decoding
 import 'graph_screen.dart'; // Import the graph screen
+import 'package:shared_preferences/shared_preferences.dart'; // Added for SharedPreferences
 
 List<dynamic> sensorsData = [];
 
@@ -27,7 +28,12 @@ class _SensorScreenState extends State<SensorScreen> {
   }
 
   Future<void> _connectToMqtt() async {
-    client = MqttServerClient('127.0.0.1', 'flutter_client');
+    final prefs = await SharedPreferences.getInstance();
+    final mqttIp = prefs.getString('mqtt_ip')!;
+    final mqttPort = int.parse(prefs.getString('mqtt_port')!);
+
+    client = MqttServerClient(mqttIp, 'flutter_client');
+    client.port = mqttPort;
     client.logging(on: true);
     client.onConnected = _onConnected;
     client.onDisconnected = _onDisconnected;
@@ -49,9 +55,15 @@ class _SensorScreenState extends State<SensorScreen> {
 
     try {
       await client.connect();
+      if (client.connectionStatus?.state != MqttConnectionState.connected) {
+        throw Exception('Failed to connect to MQTT server');
+      }
     } catch (e) {
       print('MQTT connection failed: $e');
       client.disconnect();
+      setState(() {
+        _pageTitle = 'Connection Failed'; // Update the title to indicate failure
+      });
     }
   }
 
@@ -134,6 +146,13 @@ class _SensorScreenState extends State<SensorScreen> {
     });
   }
 
+  void _clearDataAndResetDate() {
+    setState(() {
+      sensorsData.clear(); // Clear the sensorsData list
+      // _dateController.text = ''; // Reset the date input field
+    });
+  }
+
   @override
   void dispose() {
     if (client.connectionStatus?.state == MqttConnectionState.connected) {
@@ -210,7 +229,7 @@ class _SensorScreenState extends State<SensorScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Timestamp: ${data[0]}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                Text('                            ${data[0]}', style: const TextStyle(fontWeight: FontWeight.bold)),
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [
@@ -251,6 +270,7 @@ class _SensorScreenState extends State<SensorScreen> {
                   height: MediaQuery.of(context).size.width / 6, // Make height equal to width for square buttons
                   child: ElevatedButton(
                     onPressed: () {
+                      _clearDataAndResetDate(); // Clear data and reset date
                       _updatePageTitle('Sensor 1 History Data'); // Update title to Sensor 1
                       _showSensorChangeMessage(context, 'Sensor 1');
                     },
@@ -266,6 +286,7 @@ class _SensorScreenState extends State<SensorScreen> {
                   height: MediaQuery.of(context).size.width / 6, // Make height equal to width for square buttons
                   child: ElevatedButton(
                     onPressed: () {
+                      _clearDataAndResetDate(); // Clear data and reset date
                       _updatePageTitle('Sensor 2 History Data'); // Update title to Sensor 2
                       _showSensorChangeMessage(context, 'Sensor 2');
                     },
@@ -281,6 +302,7 @@ class _SensorScreenState extends State<SensorScreen> {
                   height: MediaQuery.of(context).size.width / 6, // Make height equal to width for square buttons
                   child: ElevatedButton(
                     onPressed: () {
+                      _clearDataAndResetDate(); // Clear data and reset date
                       _updatePageTitle('Sensor 3 History Data'); // Update title to Sensor 3
                       _showSensorChangeMessage(context, 'Sensor 3');
                     },
