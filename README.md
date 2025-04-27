@@ -36,16 +36,58 @@ This project is part of the UCL CASA0015 Mobile Systems coursework, demonstratin
 
 ---
 
-## Tech Stack
+## Development Environment
 
-- **Frontend**: Flutter (Dart)
-- **Backend Service**: MQTT Broker, SQL database
-- **Libraries**:
+- Flutter version: 3.7.12
+- Dart version: 3.3.0
+- Dart version: 2.19.6 
+- DevTools version:  2.20.1
+- Tested on: iOS 14(iPhone 13 Pro Max), iOS 18(iPhone15 Pro Max)
+- Major dependencies:
   - `flutter_map` (Map display)
+  - `flutter_map_marker_popup` (Map marker interaction)
   - `fl_chart` (Line charts)
   - `mqtt_client` (MQTT protocol support)
   - `shared_preferences` (Persistent local storage)
   - `intl` (Date and Time formatting)
+
+---
+
+## Key Flutter Widgets Used
+
+- `GridView`, `ListView`, `Stack`, `GestureDetector`
+- `AnimatedOpacity` (animations)
+- `Card`, `ElevatedButton`, `TextField`
+- `FlutterMap`, `FlChart`
+- `SharedPreferences`
+
+All interfaces adapt responsively to different screen sizes for a consistent user experience across devices.
+
+---
+
+## User Journey
+
+- Launch App ➔ Splash Screen ➔ Home Page with rivers list ➔
+- Select a river ➔ Real-time Map with live sensor markers ➔
+- Tap on markers to view sensor readings ➔
+- Access Sensor Data History ➔ Browse past week's readings ➔
+- Visualize historical trends via interactive Graphs ➔
+- Customize server settings if needed ➔ Real-time monitoring and proactive river protection.
+
+---
+
+## Data Management and Collection
+
+The app continuously subscribes to real-time MQTT topics to collect Dissolved Oxygen (DO), TDS, Turbidity, pH, Temperature, and Coliform data from connected river sensors.  
+Users can also request historical data for specific dates. Data are visualized both in list view and dynamic charts for clear trend analysis.
+
+---
+
+## GitHub Development Workflow
+
+The GitHub repository maintains a continuous and detailed commit history to reflect iterative development. Each feature addition, UI improvement, and bug fix is committed separately to demonstrate progress clearly.
+
+✅ Version control practices followed: branching, progressive commits, meaningful messages.
 
 ---
 
@@ -59,12 +101,11 @@ This project is part of the UCL CASA0015 Mobile Systems coursework, demonstratin
 |:---:|:---:|:---:|
 | ![History](media/history.png) | ![Graph](media/graph.png) | ![Settings](media/setting.png) |
 
-
 ---
 
 ## Folder Structure
 
-```
+```bash
 /lib
   |- main.dart               # App entry and navigation
   |- map_screen.dart         # Map view with live sensor markers
@@ -101,15 +142,18 @@ This project is part of the UCL CASA0015 Mobile Systems coursework, demonstratin
 
 | Topic         | Purpose                              |
 |:--------------|:-------------------------------------|
-| `AQ/send`     | Publish real-time sensor readings              |
+| `AQ/send`     | Publish real-time sensor readings    |
 | `AQ/request`  | Request historical sensor data       |
 | `AQ/response` | Receive requested historical data    |
+
 
 ---
 
 ## Problem Statement
 
-Many urban rivers are under-monitored despite rising pollution threats. Existing professional monitoring systems are expensive, complex, and inaccessible to local communities. **BlueGuardian** provides a low-cost, mobile-accessible system for real-time water quality tracking, aiming to foster community-driven environmental protection initiatives.
+Many urban rivers are under-monitored despite rising pollution threats. Existing professional monitoring systems are expensive, complex, and inaccessible to local communities. 
+
+**BlueGuardian** provides a low-cost, mobile-accessible system for real-time water quality tracking, aiming to foster community-driven environmental protection initiatives.
 
 ---
 
@@ -118,13 +162,13 @@ Many urban rivers are under-monitored despite rising pollution threats. Existing
 - Add user authentication and profile tracking.
 - Enable sensor fault detection and alert mechanisms.
 - Integrate weather APIs to correlate water quality with environmental conditions.
-- Support offline data caching.
+- Support offline data caching for unstable network conditions.
 
 ---
 
 ## Credits
 
-- Developed by: Zhuohang(John) Wu
+- Developed by: Zhuohang (John) Wu
 - For: CASA0015 - Mobile Systems 2024
 - Supervisor: Steven Gray
 
@@ -138,13 +182,13 @@ This project is open for academic purposes. Commercial reuse requires permission
 
 ## Contact
 
-For any queries, please email me [here](mailto:zhuohang2024@163.com).
+For any queries, please email me at [zhuohang2024@163.com](mailto:zhuohang2024@163.com).
 
 ---
 
 ## Video Demo
 
-👉 [demo video](insert-link-here)
+👉 [Demo Video](insert-link-here)
 
 ---
 
@@ -152,3 +196,4 @@ For any queries, please email me [here](mailto:zhuohang2024@163.com).
 
 A live landing page is available at 👉 [GitHub Link](https://github.com/Headmaster218/BlueGuardian)
 
+---
