@@ -295,31 +295,59 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ],
                 popupBuilder: (context, marker) {
+                  String markerName;
+                  if (marker.point == LatLng(51.5495, -0.0280)) {
+                    markerName = 'Sensor 1 Data';
+                  } else if (marker.point == LatLng(51.55500, -0.0344)) {
+                    markerName = 'Sensor 2 Data';
+                  } else if (marker.point == LatLng(51.54190, -0.02150)) {
+                    markerName = 'Sensor 3 Data';
+                  } else {
+                    markerName = 'Unknown Sensor';
+                  }
+
                   return ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 250), // Limit the popup width
                     child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start, // Align content to the left
-                          mainAxisSize: MainAxisSize.min,
-                            children: [
-                            const Center( // Center-align the title
-                              child: Text(
-                              'Sensor Data',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
+                      child: Stack(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start, // Align content to the left
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Center( // Center-align the title
+                                  child: Text(
+                                    markerName,
+                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text('           ${sensorData['timestamp'] ?? 'N/A'}'),
+                                Text('D.O.:    ${sensorData['do'] ?? 'N/A'} mg/L'),
+                                Text('TDS:    ${sensorData['tds'] ?? 'N/A'} ppm'),
+                                Text('Turb:    ${sensorData['turb'] ?? 'N/A'} NTU'),
+                                Text('pH:       ${sensorData['ph'] ?? 'N/A'}'),
+                                Text('Temp:  ${sensorData['temp'] ?? 'N/A'} °C'),
+                                Text('Coli:     ${sensorData['coli'] ?? 'N/A'} CFU/100mL'),
+                              ],
                             ),
-                            const SizedBox(height: 8),
-                            Text('           ${sensorData['timestamp'] ?? 'N/A'}'),
-                            Text('D.O.:    ${sensorData['do'] ?? 'N/A'} mg/L'),
-                            Text('TDS:    ${sensorData['tds'] ?? 'N/A'} ppm'),
-                            Text('Turb:    ${sensorData['turb'] ?? 'N/A'} NTU'),
-                            Text('pH:       ${sensorData['ph'] ?? 'N/A'}'),
-                            Text('Temp:  ${sensorData['temp'] ?? 'N/A'} °C'),
-                            Text('Coli:     ${sensorData['coli'] ?? 'N/A'} CFU/100mL'),
-                          ],
-                        ),
+                          ),
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: IconButton(
+                              icon: const Icon(Icons.close, size: 16),
+                              onPressed: () {
+                                setState(() {
+                                  popupController.hideAllPopups(); // Close the popup when "X" is clicked
+                                  activeMarker = null;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   );
