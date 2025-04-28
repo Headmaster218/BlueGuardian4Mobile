@@ -26,6 +26,17 @@ Having Contact Details is also good as it shows people how to get in contact wit
 
 ---
 
+## Table of Contents
+
+- [Features](#features)
+- [User Journey](#user-journey)
+- [Screenshots](#screenshots)
+- [Folder Structure](#folder-structure)
+- [Future Improvements](#future-improvements)
+- [Video Demo](#video-demo)
+- [Live Landing Page](#deployment)
+---
+
 ## Overview
 
 **BlueGuardian** is a Flutter-based mobile application designed to monitor and visualize river water quality in real-time using water sensors and server services. The app empowers users to interact with live environmental data, aiming to protect and improve our connected aquatic environments.
@@ -210,12 +221,12 @@ For any queries, please email me at [zhuohang2024@163.com](mailto:zhuohang2024@1
 
 ## Video Demo
 
-👉 [Demo Video](insert-link-here)
+👉 [Demo Video](./media/BlueGuardian.mp4)
 
 ---
 
 ## Deployment
 
-A live landing page is available at 👉 [GitHub Link](https://github.com/Headmaster218/BlueGuardian)
+A live landing page is available at 👉 [BlueGuardian](https://headmaster218.github.io/BlueGuardian/)
 
 ---
