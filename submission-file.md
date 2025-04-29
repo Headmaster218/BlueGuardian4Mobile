@@ -6,41 +6,43 @@ author: "Steven Gray"
 date: "10 Dec 2021"
 ---
 
+---
+editor: "John"
+data: "29 Apr 2025"
+---
+
 -->
 
-# Submission Guide
+# Link to GitHub Repository
 
-You will need to edit this file, create a PDF using the instructions below, from this file.   Sign it digitally and upload to Moodle
-
-## How to create a PDF from Markdown
-When finished you should export to PDF using VSCode and MarkdownPDF Extension. Make sure you select no headers and no footers in the
-extension preferences before exporting to PDF.   
-
-Upload this PDF into Moodle for submission including a copy of your presentation slides.
-
-## Link to GitHub Repository
-
-Flutter Application Name - MY APPLICATION NAME
-GitHub Repository - [https://github.com/ucl-casa-ce/casa0015-mobile-assessment](https://github.com/ucl-casa-ce/casa0015-mobile-assessment)
+BlueGuardian
+GitHub Repository - [https://github.com/Headmaster218/BlueGuardian4Mobile](https://github.com/Headmaster218/BlueGuardian4Mobile)
 
 ## Introduction to Application
 
-A brief 200 word explanation of your application and it's use.  Below create a Bibliography to code, tutorial, or plugins you've used in the project. Use this guide
-for citation - [https://www.scribbr.co.uk/referencing/harvard-website-reference/](https://www.scribbr.co.uk/referencing/harvard-website-reference/)
+**BlueGuardian** is a mobile application developed using Flutter to monitor and visualize the water quality of rivers in real-time. The app leverages IoT sensors to collect environmental data, including parameters like dissolved oxygen, turbidity, pH, temperature, and coliform. These sensor data are sourced from **[AquaSense](https://github.com/Headmaster218/Thames-pollution-detect-IoT)**, developed to monitor the Thames River's water quality. The data is communicated via MQTT to provide real-time updates, which are displayed on an interactive map for easy river monitoring.
 
-## Biblography
+In addition to real-time monitoring, **BlueGuardian** supports historical data retrieval and graphical visualizations, allowing users to track changes in water quality over time. The app provides a settings page to configure the MQTT server IP and port. By combining mobile development, IoT integration, and cloud communication, **BlueGuardian** offers a cost-effective, accessible solution to empower communities in protecting and improving local aquatic environments.
 
-1. Last name, First initial. (Year published). Title. Edition. (Only include the edition if it is not the first edition) City published: Publisher, Page(s). <http://google.com>
 
-2. Last name, First initial. (Year published). Title. Edition. (Only include the edition if it is not the first edition) City published: Publisher, Page(s).  <http://google.com>
+## Bibliography
+1. Flutter Dev Team. (2024). *Flutter Documentation*. 3rd Edition. Mountain View: Google Inc., Page(s). <https://flutter.dev/docs>
 
-----
+2. MQTT.org. (2024). *MQTT Protocol Overview*. 2nd Edition. Amsterdam: OASIS Open, Page(s). <https://mqtt.org/>
+
+3. Dart Dev Team. (2024). *Dart Programming Language Guide*. 1st Edition. Mountain View: Google Inc., Page(s). <https://dart.dev/guides>
+
+4. FlutterFire Team. (2024). *FlutterFire: Firebase for Flutter*. 1st Edition. Mountain View: Google Inc., Page(s). <https://firebase.flutter.dev/docs/overview>
+
+5. Wu, Z. (2024). *AquaSense: Thames Pollution Detection IoT*. 1st Edition. GitHub: Headmaster218, Page(s). <https://github.com/Headmaster218/Thames-pollution-detect-IoT>
+
+6. OpenAI. (2024). *ChatGPT: Language Model for Code Generation and Documentation Assistance*. 1st Edition. San Francisco: OpenAI, Page(s). <https://chat.openai.com/>
 
 ## Declaration of Authorship
 
-We, AUTHORS NAME HERE, confirm that the work presented in this assessment is my own. Where information has been derived from other sources, I confirm that this has been indicated in the work.
+We, Zhuohang Wu, confirm that the work presented in this assessment is my own. Where information has been derived from other sources, I confirm that this has been indicated in the work.
+
+<br><br>
 
 
-Digitally Sign with Your name Here
-
-ASSESSMENT DATE
+29 Apr, 2025
