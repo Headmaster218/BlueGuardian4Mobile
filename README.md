@@ -11,9 +11,10 @@ This project is part of the UCL CASA0015 Mobile Systems coursework, demonstratin
 ## Table of Contents
 
 - [Features](#features)
+- [Development Environment](#Development-Environment)
 - [User Journey](#user-journey)
 - [Screenshots](#screenshots)
-- [Folder Structure](#folder-structure)
+- [Usage Instructions](#Usage-Instructions)
 - [Future Improvements](#future-improvements)
 - [Video Demo](#video-demo)
 - [Live Landing Page](#deployment)
